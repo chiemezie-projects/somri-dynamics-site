@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "General Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", "General Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #fafaf9;
+  --color-paper-2: #f2f1ee;
+  --color-ink: #141414;
+  --color-ink-2: #2c2c2a;
+  --color-grey: #75756d;
+  --color-rule: #dcdad3;
+  --color-accent: #6d28d9;
+  --color-accent-2: #8b5cf6;
+
+  --animate-marquee: marquee 26s linear infinite;
+  --animate-blink: blink 1.4s steps(2, start) infinite;
+
+  @keyframes marquee {
+    to { transform: translateX(-50%); }
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* base typography discipline: kerning + legibility on */
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  font-optical-sizing: auto;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* display type: bold, optically tight, always kerned */
+.font-display {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-feature-settings: "kern" 1;
+}
+
+/* small label type: medium weight, modest tracked caps */
+.font-mono {
+  font-weight: 600;
+}
+
+/* faint utilitarian grid backdrop */
+.bg-blueprint {
+  background-image:
+    linear-gradient(to right, rgba(20, 20, 20, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 20, 20, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* barcode */
+.barcode {
+  background-image: repeating-linear-gradient(
+    90deg,
+    currentColor 0 2px, transparent 2px 5px,
+    currentColor 5px 9px, transparent 9px 11px,
+    currentColor 11px 12px, transparent 12px 17px,
+    currentColor 17px 20px, transparent 20px 22px,
+    currentColor 22px 23px, transparent 23px 29px
+  );
+}
+
+/* stamped seal */
+.stamp {
+  clip-path: polygon(0 10%, 5% 0, 95% 0, 100% 10%, 100% 90%, 95% 100%, 5% 100%, 0 90%);
+}
