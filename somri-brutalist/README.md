@@ -45,8 +45,9 @@ To re-seed the demo data, clear these localStorage keys:
 1. Create a project at [supabase.com](https://supabase.com).
 2. In the SQL editor, run [`supabase/schema.sql`](./supabase/schema.sql) — tables, triggers,
    row-level security and seeding.
-3. In Authentication → Users, invite your staff (their profile starts as `editor`), then set
-   Owner/Admin access from the app's Access tab.
+3. In Authentication → Users, invite your staff (public signups are disabled in the
+   project config — accounts only exist by invitation), then set their Owner/Admin
+   role from the app's Access tab.
 4. Create `.env` in the project root:
 
 ```bash

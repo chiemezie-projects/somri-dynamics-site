@@ -52,40 +52,40 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ---------- row level security ----------
+-- Policies use security-definer helpers so the profiles policy never
+-- queries profiles itself (avoids infinite recursion).
 
 alter table site_copy enable row level security;
 alter table listings  enable row level security;
 alter table profiles  enable row level security;
 
--- profiles: anyone signed in can read; role changes owner-only
-create policy "profiles read" on profiles
-  for select using (auth.role() = 'authenticated');
+create or replace function public.is_staff() returns boolean
+language sql security definer stable set search_path = public as $$
+  select exists (select 1 from profiles p where p.id = auth.uid());
+$$;
 
-create policy "profiles write" on profiles
-  for all using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin'))
-  ) with check (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin'))
-  );
+create or replace function public.is_admin() returns boolean
+language sql security definer stable set search_path = public as $$
+  select exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin'));
+$$;
+
+-- profiles: staff see each other; owner/admin manage
+create policy "profiles can see staff" on profiles
+  for select using (id = auth.uid() or public.is_staff());
+
+create policy "admins manage staff" on profiles
+  for all using (public.is_admin()) with check (public.is_admin());
 
 -- public read of listings + copy; staff write
 create policy "listings public read" on listings
   for select using (true);
 create policy "listings staff write" on listings
-  for all using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin','editor'))
-  ) with check (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin','editor'))
-  );
+  for all using (public.is_staff()) with check (public.is_staff());
 
 create policy "copy public read" on site_copy
   for select using (true);
 create policy "copy admin write" on site_copy
-  for all using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin'))
-  ) with check (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role in ('owner','admin'))
-  );
+  for all using (public.is_admin()) with check (public.is_admin());
 
 -- ---------- seed ----------
 insert into site_copy (id, data) values ('site', '{}')
